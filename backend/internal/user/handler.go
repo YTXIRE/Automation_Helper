@@ -2,6 +2,7 @@ package user
 
 import (
 	"backend/internal/handlers"
+	"backend/pkg/logging"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
@@ -13,18 +14,22 @@ const (
 	userUrl  = "/user/:uuid"
 )
 
-type handler struct{}
+type handler struct {
+	logger logging.Logger
+}
 
-func NewHandler() handlers.Handler {
-	return &handler{}
+func NewHandler(logger logging.Logger) handlers.Handler {
+	return &handler{
+		logger: logger,
+	}
 }
 
 func (h *handler) Register(router *httprouter.Router) {
 	router.GET(usersUrl, h.GetList)
 	router.GET(userUrl, h.GetUserByUUID)
 	router.POST(usersUrl, h.CreateUser)
-	router.PATCH(userUrl, h.UpdateUser)
-	router.PUT(userUrl, h.PartiallyUpdateUser)
+	router.PUT(userUrl, h.UpdateUser)
+	router.PATCH(userUrl, h.PartiallyUpdateUser)
 	router.DELETE(userUrl, h.DeleteUser)
 }
 

@@ -2,24 +2,25 @@ package main
 
 import (
 	"backend/internal/user"
+	"backend/pkg/logging"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net"
 	"net/http"
 	"time"
 )
 
 func main() {
-	log.Println("Create router")
+	logger := logging.GetLogger()
+	logger.Info("Create router")
 	router := httprouter.New()
-	log.Println("Register user handler")
-	handler := user.NewHandler()
+	logger.Info("Register user handler")
+	handler := user.NewHandler(logger)
 	handler.Register(router)
-	initial(router)
+	initial(router, logger)
 }
 
-func initial(router *httprouter.Router) {
-	log.Println("Start Application")
+func initial(router *httprouter.Router, logger logging.Logger) {
+	logger.Info("Start Application")
 	listener, err := net.Listen("tcp", ":4000")
 	if err != nil {
 		panic(err)
@@ -31,6 +32,6 @@ func initial(router *httprouter.Router) {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Println("Server is listening port 4000")
-	log.Fatalln(server.Serve(listener))
+	logger.Info("Server is listening port 4000")
+	logger.Fatal(server.Serve(listener))
 }
