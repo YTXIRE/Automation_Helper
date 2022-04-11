@@ -1,6 +1,7 @@
 package server
 
 import (
+	"backend/internal/app/store"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -11,6 +12,7 @@ type Server struct {
 	config *Config
 	logger *logrus.Logger
 	router *mux.Router
+	store  *store.Store
 }
 
 func New(config *Config) *Server {
@@ -25,11 +27,11 @@ func (s *Server) Start() error {
 	if err := s.configureLogger(); err != nil {
 		return err
 	}
-
 	s.configureRouter()
-
+	if err := s.configureStore(); err != nil {
+		return err
+	}
 	s.logger.Info("Starting api server")
-
 	return http.ListenAndServe(s.config.BindAddr, s.router)
 }
 
@@ -44,6 +46,15 @@ func (s *Server) configureLogger() error {
 
 func (s *Server) configureRouter() {
 	s.router.HandleFunc("/users", s.GetUsers())
+}
+
+func (s *Server) configureStore() error {
+	st := store.New(s.config.Store)
+	if err := st.Open(s.logger); err != nil {
+		return err
+	}
+	s.store = st
+	return nil
 }
 
 func (s *Server) GetUsers() http.HandlerFunc {

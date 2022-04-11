@@ -1,2 +1,5 @@
 bind_addr = ":8080"
 log_level = "debug"
+
+[store]
+db_url = "host=localhost dbname=automation_helper sslmode=disable"
