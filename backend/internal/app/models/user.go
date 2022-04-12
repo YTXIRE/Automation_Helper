@@ -8,14 +8,14 @@ import (
 )
 
 type User struct {
-	ID          uuid.UUID
-	Email       string
-	Password    string
-	RawPassword string
-	Login       string
-	CreatedAt   int64
-	UpdatedAt   int64
-	LastLogin   int64
+	ID          uuid.UUID `json:"id"`
+	Email       string    `json:"email"`
+	Password    string    `json:"-"`
+	RawPassword string    `json:"-"`
+	Login       string    `json:"login"`
+	CreatedAt   int64     `json:"created_at"`
+	UpdatedAt   int64     `json:"-"`
+	LastLogin   int64     `json:"-"`
 }
 
 func (u *User) Validate() error {

@@ -2,9 +2,9 @@ package server
 
 import (
 	"backend/internal/app/store"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"io"
 	"net/http"
 )
 
@@ -59,6 +59,16 @@ func (s *Server) configureStore() error {
 
 func (s *Server) GetUsers() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		io.WriteString(writer, "get users")
+		email, err := s.store.User().FindByEmail("admin@it-paradise.com")
+		if err != nil {
+			logrus.Error(err)
+		}
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusOK)
+		marshal, err := json.Marshal(email)
+		if err != nil {
+			return
+		}
+		writer.Write(marshal)
 	}
 }
