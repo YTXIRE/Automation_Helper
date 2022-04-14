@@ -1,26 +1,32 @@
 package main
 
 import (
+	"backend/internal/config"
 	"backend/internal/user"
+	"backend/pkg/logging"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net"
 	"net/http"
 	"time"
 )
 
 func main() {
-	log.Println("Create router")
+	logger := logging.GetLogger()
+	logger.Info("Create router")
 	router := httprouter.New()
-	log.Println("Register user handler")
-	handler := user.NewHandler()
+
+	cfg := config.GetConfig()
+
+	logger.Info("Register user handler")
+	handler := user.NewHandler(logger)
 	handler.Register(router)
-	initial(router)
+	initial(router, logger, cfg)
 }
 
-func initial(router *httprouter.Router) {
-	log.Println("Start application")
-	listener, err := net.Listen("tcp", ":10000")
+func initial(router *httprouter.Router, logger *logging.Logger, cfg *config.Config) {
+	logger.Info("Start application")
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", cfg.Listen.BindIP, cfg.Listen.Port))
 	if err != nil {
 		panic(err)
 	}
@@ -29,6 +35,6 @@ func initial(router *httprouter.Router) {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	log.Println("Server is listening 0.0.0.0:10000")
-	log.Fatal(server.Serve(listener))
+	logger.Infof("Server is listening  %s:%s", cfg.Listen.BindIP, cfg.Listen.Port)
+	logger.Fatal(server.Serve(listener))
 }

@@ -2,16 +2,21 @@ package user
 
 import (
 	"backend/internal/handlers"
+	"backend/pkg/logging"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
 var _ handlers.Handler = &handler{}
 
-type handler struct{}
+type handler struct {
+	logger *logging.Logger
+}
 
-func NewHandler() handlers.Handler {
-	return &handler{}
+func NewHandler(logger *logging.Logger) handlers.Handler {
+	return &handler{
+		logger: logger,
+	}
 }
 
 const (
