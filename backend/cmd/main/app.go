@@ -30,14 +30,17 @@ func main() {
 		Database: cfg.MongoDB.Database,
 		AuthDB:   cfg.MongoDB.AuthDB,
 	})
+
 	if err != nil {
 		panic(err)
 	}
+
 	storage := db.NewStorage(mongoDBClient, "users", logger)
 
 	logger.Info("Register user handler")
 	handler := user.NewHandler(logger, storage)
 	handler.Register(router)
+
 	initial(router, logger, cfg)
 }
 
