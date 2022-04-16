@@ -2,8 +2,10 @@ package main
 
 import (
 	"backend/internal/config"
+	"backend/internal/project"
+	projectDb "backend/internal/project/db"
 	"backend/internal/user"
-	"backend/internal/user/db"
+	userDb "backend/internal/user/db"
 	"backend/pkg/client/mongodb"
 	"backend/pkg/logging"
 	"context"
@@ -35,11 +37,18 @@ func main() {
 		panic(err)
 	}
 
-	storage := db.NewStorage(mongoDBClient, "users", logger)
+	logger.Info("Create user storage")
+	userStorage := userDb.NewStorage(mongoDBClient, "users", logger)
+	logger.Info("Create project storage")
+	projectStorage := projectDb.NewStorage(mongoDBClient, "projects", logger)
 
 	logger.Info("Register user handler")
-	handler := user.NewHandler(logger, storage)
-	handler.Register(router)
+	userHandler := user.NewHandler(logger, userStorage)
+	userHandler.Register(router)
+
+	logger.Info("Register project handler")
+	projectHandler := project.NewHandler(logger, projectStorage)
+	projectHandler.Register(router)
 
 	initial(router, logger, cfg)
 }
