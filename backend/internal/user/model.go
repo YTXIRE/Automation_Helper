@@ -10,7 +10,8 @@ type User struct {
 	LastLogin    int64  `json:"last_login" bson:"last_login"`
 }
 
-type CreateUserDTO struct {
+type DTO struct {
+	ID        string `json:"id" bson:"_id,omitempty"`
 	Email     string `json:"email"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`

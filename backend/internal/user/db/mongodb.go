@@ -59,11 +59,11 @@ func (d *db) FindOne(ctx context.Context, id string) (u user.User, err error) {
 }
 
 func (d *db) FindByField(ctx context.Context, field, value string) (u user.User, err error) {
-	cursor, err := d.collection.Find(ctx, bson.M{field: value})
-	if cursor.Err() != nil {
-		return u, fmt.Errorf("failed to find user due to error: %v", err)
+	result := d.collection.FindOne(ctx, bson.M{field: value})
+	if result.Err() != nil {
+		return u, nil
 	}
-	if err := cursor.All(ctx, &u); err != nil {
+	if err := result.Decode(&u); err != nil {
 		return u, nil
 	}
 	return u, nil

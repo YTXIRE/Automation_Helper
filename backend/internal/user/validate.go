@@ -5,7 +5,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
-func (user CreateUserDTO) Validate() error {
+func (user DTO) Validate() error {
 	return validation.ValidateStruct(
 		&user,
 		validation.Field(&user.Email, validation.Required, is.Email),
