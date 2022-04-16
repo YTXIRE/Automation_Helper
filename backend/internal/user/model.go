@@ -15,6 +15,4 @@ type CreateUserDTO struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	CreatedAt int64  `json:"created_at"`
-	UpdatedAt int64  `json:"updated_at"`
-	LastLogin int64  `json:"last_login"`
 }

@@ -3,7 +3,10 @@ package main
 import (
 	"backend/internal/config"
 	"backend/internal/user"
+	"backend/internal/user/db"
+	"backend/pkg/client/mongodb"
 	"backend/pkg/logging"
+	"context"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net"
@@ -18,22 +21,22 @@ func main() {
 
 	cfg := config.GetConfig()
 
-	//mongoDBClient, err := mongodb.NewClient(&mongodb.Config{
-	//	Ctx:      context.Background(),
-	//	Host:     cfg.MongoDB.Host,
-	//	Port:     cfg.MongoDB.Port,
-	//	Username: cfg.MongoDB.Username,
-	//	Password: cfg.MongoDB.Password,
-	//	Database: cfg.MongoDB.Database,
-	//	AuthDB:   cfg.MongoDB.AuthDB,
-	//})
-	//if err != nil {
-	//	panic(err)
-	//}
-	//storage := db.NewStorage(mongoDBClient, "users", logger)
+	mongoDBClient, err := mongodb.NewClient(&mongodb.Config{
+		Ctx:      context.Background(),
+		Host:     cfg.MongoDB.Host,
+		Port:     cfg.MongoDB.Port,
+		Username: cfg.MongoDB.Username,
+		Password: cfg.MongoDB.Password,
+		Database: cfg.MongoDB.Database,
+		AuthDB:   cfg.MongoDB.AuthDB,
+	})
+	if err != nil {
+		panic(err)
+	}
+	storage := db.NewStorage(mongoDBClient, "users", logger)
 
 	logger.Info("Register user handler")
-	handler := user.NewHandler(logger)
+	handler := user.NewHandler(logger, storage)
 	handler.Register(router)
 	initial(router, logger, cfg)
 }
