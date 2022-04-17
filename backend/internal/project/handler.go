@@ -4,6 +4,8 @@ import (
 	"backend/internal/apperror"
 	"backend/internal/handlers"
 	"backend/pkg/logging"
+	"context"
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
@@ -37,22 +39,67 @@ func (h *handler) Register(router *httprouter.Router) {
 }
 
 func (h *handler) GetList(w http.ResponseWriter, r *http.Request) error {
-	w.Write([]byte("GetList"))
+	projectsList, err := h.service.GetProjectsList(context.Background(), h.storage)
+	if err != nil {
+		return apperror.NewAppError(err, err.Error(), "")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(projectsList)
 	return nil
 }
 
 func (h *handler) GetProjectByUUID(w http.ResponseWriter, r *http.Request) error {
+	params := httprouter.ParamsFromContext(r.Context())
+	oid := params.ByName("uuid")
+	user, err := h.service.GetProjectByID(context.Background(), h.storage, oid)
+	if err != nil {
+		return apperror.NewAppError(err, err.Error(), "")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 	return nil
 }
 
 func (h *handler) CreateProject(w http.ResponseWriter, r *http.Request) error {
+	var project Project
+	err := json.NewDecoder(r.Body).Decode(&project)
+	if err != nil {
+		return apperror.NewAppError(err, "failed to decode request body in json", "")
+	}
+	user, err := h.service.Create(context.Background(), project, h.storage)
+	if err != nil {
+		return apperror.NewAppError(err, err.Error(), "")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(user)
 	return nil
 }
 
 func (h *handler) UpdateProject(w http.ResponseWriter, r *http.Request) error {
+	var projectData Project
+	err := json.NewDecoder(r.Body).Decode(&projectData)
+	if err != nil {
+		return apperror.NewAppError(err, "failed to decode request body in json", "")
+	}
+	params := httprouter.ParamsFromContext(r.Context())
+	projectData.ID = params.ByName("uuid")
+	project, err := h.service.UpdateProject(context.Background(), h.storage, projectData)
+	if err != nil {
+		return apperror.NewAppError(err, err.Error(), "")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(project)
 	return nil
 }
 
 func (h *handler) DeleteProject(w http.ResponseWriter, r *http.Request) error {
+	params := httprouter.ParamsFromContext(r.Context())
+	oid := params.ByName("uuid")
+	err := h.service.DeleteProject(context.Background(), h.storage, oid)
+	if err != nil {
+		return apperror.NewAppError(err, err.Error(), "")
+	}
+	w.WriteHeader(http.StatusNoContent)
 	return nil
 }

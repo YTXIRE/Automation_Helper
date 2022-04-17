@@ -3,22 +3,20 @@ package apperror
 import "encoding/json"
 
 var (
-	ErrNotFound = NewAppError(nil, "not found", "", "US-000003")
+	ErrNotFound = NewAppError(nil, "not found", "")
 )
 
 type AppError struct {
 	Err              error  `json:"-"`
 	Message          string `json:"message,omitempty"`
 	DeveloperMessage string `json:"developer_message,omitempty"`
-	Code             string `json:"code,omitempty"`
 }
 
-func NewAppError(err error, message, developerMessage, code string) *AppError {
+func NewAppError(err error, message, developerMessage string) *AppError {
 	return &AppError{
 		Err:              err,
 		Message:          message,
 		DeveloperMessage: developerMessage,
-		Code:             code,
 	}
 }
 
@@ -39,5 +37,5 @@ func (e AppError) Marshal() []byte {
 }
 
 func systemError(err error) *AppError {
-	return NewAppError(err, "internal system error", err.Error(), "US-000000")
+	return NewAppError(err, "internal system error", err.Error())
 }
