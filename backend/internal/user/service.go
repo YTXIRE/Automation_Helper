@@ -16,25 +16,25 @@ type Service struct {
 func (s *Service) Create(ctx context.Context, user DTO, storage Storage) (User, error) {
 	err := user.Validate()
 	if err != nil {
-		return User{}, apperror.NewAppError(err, err.Error(), "")
+		return User{}, apperror.NewAppError(err, err.Error(), "", "VALIDATE_ERROR")
 	}
 	findUser, err := storage.FindByField(ctx, "email", user.Email)
 	if err != nil {
-		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with email: %s. error: %v", user.Email, err), "")
+		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with email: %s. error: %v", user.Email, err), "", "FIND_ERROR")
 	}
 	if findUser.Email != "" {
-		return User{}, apperror.NewAppError(nil, "this email is already busy", "")
+		return User{}, apperror.NewAppError(nil, "this email is already busy", "", "EMAIL_ALREADY_BUSY_ERROR")
 	}
 	findUser, err = storage.FindByField(ctx, "username", user.Username)
 	if err != nil {
-		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with username: %s. error: %v", user.Username, err), "")
+		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with username: %s. error: %v", user.Username, err), "", "FIND_ERROR")
 	}
 	if findUser.Username != "" {
-		return User{}, apperror.NewAppError(nil, "this username is already busy", "")
+		return User{}, apperror.NewAppError(nil, "this username is already busy", "", "USERNAME_ALREADY_BUSY_ERROR")
 	}
 	hash, err := encrypt.HashPassword(user.Password)
 	if err != nil {
-		return User{}, apperror.NewAppError(err, err.Error(), "")
+		return User{}, apperror.NewAppError(err, err.Error(), "", "GENERATE_HASH_ERROR")
 	}
 	createUserData := User{
 		ID:           "",
@@ -47,7 +47,7 @@ func (s *Service) Create(ctx context.Context, user DTO, storage Storage) (User, 
 	}
 	oid, err := storage.Create(ctx, createUserData)
 	if err != nil {
-		return User{}, apperror.NewAppError(err, err.Error(), "")
+		return User{}, apperror.NewAppError(err, err.Error(), "", "CREATE_ERROR")
 	}
 	createUserData.ID = oid
 	return createUserData, err
@@ -56,7 +56,7 @@ func (s *Service) Create(ctx context.Context, user DTO, storage Storage) (User, 
 func (s *Service) GetUserList(ctx context.Context, storage Storage) ([]User, error) {
 	users, err := storage.FindAll(ctx)
 	if err != nil {
-		return nil, apperror.NewAppError(err, err.Error(), "")
+		return nil, apperror.NewAppError(err, err.Error(), "", "FIND_ERROR")
 	}
 	if len(users) == 0 {
 		return []User{}, nil
@@ -75,21 +75,21 @@ func (s *Service) GetUserByID(ctx context.Context, storage Storage, id string) (
 func (s *Service) UpdateUser(ctx context.Context, storage Storage, user DTO) (User, error) {
 	err := user.Validate()
 	if err != nil {
-		return User{}, apperror.NewAppError(err, err.Error(), "")
+		return User{}, apperror.NewAppError(err, err.Error(), "", "VALIDATE_ERROR")
 	}
 	findUser, err := storage.FindByField(ctx, "email", user.Email)
 	if err != nil {
-		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with email: %s. error: %v", user.Email, err), "")
+		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with email: %s. error: %v", user.Email, err), "", "FIND_ERROR")
 	}
 	if findUser.Email != "" {
-		return User{}, apperror.NewAppError(nil, "this email is already busy", "")
+		return User{}, apperror.NewAppError(nil, "this email is already busy", "", "EMAIL_ALREADY_BUSY_ERROR")
 	}
 	findUser, err = storage.FindByField(ctx, "username", user.Username)
 	if err != nil {
-		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with username: %s. error: %v", user.Username, err), "")
+		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with username: %s. error: %v", user.Username, err), "", "FIND_ERROR")
 	}
 	if findUser.Username != "" {
-		return User{}, apperror.NewAppError(nil, "this username is already busy", "")
+		return User{}, apperror.NewAppError(nil, "this username is already busy", "", "USERNAME_ALREADY_BUSY_ERROR")
 	}
 	findUser, err = storage.FindOne(ctx, user.ID)
 	if err != nil {
@@ -104,14 +104,14 @@ func (s *Service) UpdateUser(ctx context.Context, storage Storage, user DTO) (Us
 	if user.Password != "" {
 		hash, err := encrypt.HashPassword(user.Password)
 		if err != nil {
-			return User{}, apperror.NewAppError(err, err.Error(), "")
+			return User{}, apperror.NewAppError(err, err.Error(), "", "GENERATE_HASH_ERROR")
 		}
 		findUser.PasswordHash = hash
 	}
 	findUser.UpdatedAt = time.Now().Unix()
 	err = storage.Update(ctx, findUser)
 	if err != nil {
-		return User{}, apperror.NewAppError(err, "failed to update user", "")
+		return User{}, apperror.NewAppError(err, "failed to update user", "", "UPDATE_ERROR")
 	}
 	return findUser, nil
 }

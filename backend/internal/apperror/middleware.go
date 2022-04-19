@@ -5,9 +5,9 @@ import (
 	"net/http"
 )
 
-type appHandler func(w http.ResponseWriter, r *http.Request) error
+type AppHandler func(w http.ResponseWriter, r *http.Request) error
 
-func Middleware(h appHandler) http.HandlerFunc {
+func Middleware(h AppHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var appErr *AppError
 		err := h(w, r)

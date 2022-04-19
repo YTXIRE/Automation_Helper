@@ -15,14 +15,14 @@ type Service struct {
 func (s *Service) Create(ctx context.Context, project Project, storage Storage) (Project, error) {
 	err := project.Validate()
 	if err != nil {
-		return Project{}, apperror.NewAppError(err, err.Error(), "")
+		return Project{}, apperror.NewAppError(err, err.Error(), "", "VALIDATE_ERROR")
 	}
 	findUser, err := storage.FindByField(ctx, "name", project.Name)
 	if err != nil {
-		return Project{}, apperror.NewAppError(err, fmt.Sprintf("failed to find project with name: %s. error: %v", project.Name, err), "")
+		return Project{}, apperror.NewAppError(err, fmt.Sprintf("failed to find project with name: %s. error: %v", project.Name, err), "", "FIND_ERROR")
 	}
 	if findUser.Name != "" {
-		return Project{}, apperror.NewAppError(nil, "this name is already busy", "")
+		return Project{}, apperror.NewAppError(nil, "this name is already busy", "", "NAME_ALREADY_BUSY_ERROR")
 	}
 	createProjectData := Project{
 		ID:                "",
@@ -33,7 +33,7 @@ func (s *Service) Create(ctx context.Context, project Project, storage Storage) 
 	}
 	oid, err := storage.Create(ctx, createProjectData)
 	if err != nil {
-		return Project{}, apperror.NewAppError(err, err.Error(), "")
+		return Project{}, apperror.NewAppError(err, err.Error(), "", "CREATE_ERROR")
 	}
 	createProjectData.ID = oid
 	return createProjectData, err
@@ -42,7 +42,7 @@ func (s *Service) Create(ctx context.Context, project Project, storage Storage) 
 func (s *Service) GetProjectsList(ctx context.Context, storage Storage) ([]Project, error) {
 	projects, err := storage.FindAll(ctx)
 	if err != nil {
-		return nil, apperror.NewAppError(err, err.Error(), "")
+		return nil, apperror.NewAppError(err, err.Error(), "", "FIND_ERROR")
 	}
 	if len(projects) == 0 {
 		return []Project{}, nil
@@ -61,14 +61,14 @@ func (s *Service) GetProjectByID(ctx context.Context, storage Storage, id string
 func (s *Service) UpdateProject(ctx context.Context, storage Storage, project Project) (Project, error) {
 	err := project.Validate()
 	if err != nil {
-		return Project{}, apperror.NewAppError(err, err.Error(), "")
+		return Project{}, apperror.NewAppError(err, err.Error(), "", "VALIDATE_ERROR")
 	}
 	findProject, err := storage.FindByField(ctx, "name", project.Name)
 	if err != nil {
-		return Project{}, apperror.NewAppError(err, fmt.Sprintf("failed to find project with name: %s. error: %v", project.Name, err), "")
+		return Project{}, apperror.NewAppError(err, fmt.Sprintf("failed to find project with name: %s. error: %v", project.Name, err), "", "FIND_ERROR")
 	}
 	if findProject.Name != "" {
-		return Project{}, apperror.NewAppError(nil, "this name is already busy", "")
+		return Project{}, apperror.NewAppError(nil, "this name is already busy", "", "NAME_ALREADY_BUSY_ERROR")
 	}
 	findProject, err = storage.FindOne(ctx, project.ID)
 	if err != nil {
@@ -83,7 +83,7 @@ func (s *Service) UpdateProject(ctx context.Context, storage Storage, project Pr
 	findProject.UpdatedAt = time.Now().Unix()
 	err = storage.Update(ctx, findProject)
 	if err != nil {
-		return Project{}, apperror.NewAppError(err, "failed to update project", "")
+		return Project{}, apperror.NewAppError(err, "failed to update project", "", "UPDATE_ERROR")
 	}
 	return findProject, nil
 }
