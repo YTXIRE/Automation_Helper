@@ -3,7 +3,7 @@ package user
 import (
 	"backend/internal/apperror"
 	"backend/internal/handlers"
-	"backend/internal/middleware"
+	"backend/internal/middlewares"
 	"backend/pkg/logging"
 	"context"
 	"encoding/json"
@@ -32,11 +32,11 @@ const (
 )
 
 func (h *handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, usersUrl, middleware.AuthMiddleware(apperror.Middleware(h.GetList)))
-	router.HandlerFunc(http.MethodGet, userURL, middleware.AuthMiddleware(apperror.Middleware(h.GetUserByUUID)))
-	router.HandlerFunc(http.MethodPost, usersUrl, middleware.AuthMiddleware(apperror.Middleware(h.CreateUser)))
-	router.HandlerFunc(http.MethodPut, userURL, middleware.AuthMiddleware(apperror.Middleware(h.UpdateUser)))
-	router.HandlerFunc(http.MethodDelete, userURL, middleware.AuthMiddleware(apperror.Middleware(h.DeleteUser)))
+	router.HandlerFunc(http.MethodGet, usersUrl, middlewares.AuthMiddleware(apperror.Middleware(h.GetList)))
+	router.HandlerFunc(http.MethodGet, userURL, middlewares.AuthMiddleware(apperror.Middleware(h.GetUserByUUID)))
+	router.HandlerFunc(http.MethodPost, usersUrl, middlewares.AuthMiddleware(apperror.Middleware(h.CreateUser)))
+	router.HandlerFunc(http.MethodPut, userURL, middlewares.AuthMiddleware(apperror.Middleware(h.UpdateUser)))
+	router.HandlerFunc(http.MethodDelete, userURL, middlewares.AuthMiddleware(apperror.Middleware(h.DeleteUser)))
 }
 
 func (h *handler) GetList(w http.ResponseWriter, r *http.Request) error {

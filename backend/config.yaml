@@ -10,3 +10,11 @@ mongodb:
     auth_db:
     username:
     password:
+jwt:
+    access_token:
+        ttl: 12
+        type: h
+    refresh_token:
+        ttl: 30
+        type: d
+    secret_key: skdjfbJLHBKJDBfkjsdbfkjANefiwu4htifnIUQ#78t2hg8h89H*&#G&^gw7uc3YUG&^#Gr7#f82h387G^#G76G#&r9[J)(#JRP(#HOF8#GF&*3HF(P#*F

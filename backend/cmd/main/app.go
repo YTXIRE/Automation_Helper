@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/auth"
 	"backend/internal/config"
 	"backend/internal/project"
 	projectDb "backend/internal/project/db"
@@ -41,6 +42,10 @@ func main() {
 	userStorage := userDb.NewStorage(mongoDBClient, "users", logger)
 	logger.Info("Create project storage")
 	projectStorage := projectDb.NewStorage(mongoDBClient, "projects", logger)
+
+	logger.Info("Register auth handler")
+	authHandler := auth.NewHandler(logger, userStorage)
+	authHandler.Register(router)
 
 	logger.Info("Register user handler")
 	userHandler := user.NewHandler(logger, userStorage)

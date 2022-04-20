@@ -1,6 +1,8 @@
 package user
 
-import "context"
+import (
+	"context"
+)
 
 type Storage interface {
 	Create(ctx context.Context, user User) (string, error)

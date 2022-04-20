@@ -81,14 +81,14 @@ func (s *Service) UpdateUser(ctx context.Context, storage Storage, user DTO) (Us
 	if err != nil {
 		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with email: %s. error: %v", user.Email, err), "", "FIND_ERROR")
 	}
-	if findUser.Email != "" {
+	if findUser.Email != "" && findUser.Email != user.Email {
 		return User{}, apperror.NewAppError(nil, "this email is already busy", "", "EMAIL_ALREADY_BUSY_ERROR")
 	}
 	findUser, err = storage.FindByField(ctx, "username", user.Username)
 	if err != nil {
 		return User{}, apperror.NewAppError(err, fmt.Sprintf("failed to find user with username: %s. error: %v", user.Username, err), "", "FIND_ERROR")
 	}
-	if findUser.Username != "" {
+	if findUser.Username != "" && findUser.Username != user.Username {
 		return User{}, apperror.NewAppError(nil, "this username is already busy", "", "USERNAME_ALREADY_BUSY_ERROR")
 	}
 	findUser, err = storage.FindOne(ctx, user.ID)

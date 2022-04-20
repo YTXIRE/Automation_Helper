@@ -3,7 +3,7 @@ package project
 import (
 	"backend/internal/apperror"
 	"backend/internal/handlers"
-	"backend/internal/middleware"
+	"backend/internal/middlewares"
 	"backend/pkg/logging"
 	"context"
 	"encoding/json"
@@ -32,11 +32,11 @@ const (
 )
 
 func (h *handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, projectsUrl, middleware.AuthMiddleware(apperror.Middleware(h.GetList)))
-	router.HandlerFunc(http.MethodGet, projectURL, middleware.AuthMiddleware(apperror.Middleware(h.GetProjectByUUID)))
-	router.HandlerFunc(http.MethodPost, projectsUrl, middleware.AuthMiddleware(apperror.Middleware(h.CreateProject)))
-	router.HandlerFunc(http.MethodPut, projectURL, middleware.AuthMiddleware(apperror.Middleware(h.UpdateProject)))
-	router.HandlerFunc(http.MethodDelete, projectURL, middleware.AuthMiddleware(apperror.Middleware(h.DeleteProject)))
+	router.HandlerFunc(http.MethodGet, projectsUrl, middlewares.AuthMiddleware(apperror.Middleware(h.GetList)))
+	router.HandlerFunc(http.MethodGet, projectURL, middlewares.AuthMiddleware(apperror.Middleware(h.GetProjectByUUID)))
+	router.HandlerFunc(http.MethodPost, projectsUrl, middlewares.AuthMiddleware(apperror.Middleware(h.CreateProject)))
+	router.HandlerFunc(http.MethodPut, projectURL, middlewares.AuthMiddleware(apperror.Middleware(h.UpdateProject)))
+	router.HandlerFunc(http.MethodDelete, projectURL, middlewares.AuthMiddleware(apperror.Middleware(h.DeleteProject)))
 }
 
 func (h *handler) GetList(w http.ResponseWriter, r *http.Request) error {

@@ -21,6 +21,17 @@ type Config struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
 	} `yaml:"mongodb"`
+	Jwt struct {
+		AccessToken struct {
+			TTL  int64  `yaml:"ttl" env-default:"12"`
+			Type string `yaml:"type" env-default:"h"`
+		} `yaml:"access_token"`
+		RefreshToken struct {
+			TTL  int64  `yaml:"ttl" env-default:"30"`
+			Type string `yaml:"type" env-default:"d"`
+		} `yaml:"refresh_token"`
+		SecretKey string `yaml:"secret_key" env-default:"verySecretKey"`
+	} `yaml:"jwt"`
 }
 
 var instance *Config
